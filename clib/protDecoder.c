@@ -61,10 +61,24 @@ tCommandsData	comControlData;
 tNavData	navControlData;
 tSensData senControlData;
 tLogFloats  logControlData;
-// TODO: Log Flotas currently is only used in the control MCU
+// TODO: Log Floats currently is only used in the control MCU
 //			 make sure to add it to dataLogger.c so it gets scheduled
 // 			 from the sensor MCU in case it needs to be used there.
 
+
+// Mavlink definitions these will get moved eventually to their own IPC file
+
+mavlink_gps_raw_t	mlGpsData;
+mavlink_cpu_load_t mlCpuLoadData;
+mavlink_air_data_t mlAirData;
+mavlink_sensor_bias_t mlSensorBiasData;
+mavlink_diagnostic_t mlDiagnosticData;
+mavlink_pilot_console_t mlPilotConsoleData;
+mavlink_pwm_commands_t mlPwmCommandsData;
+mavlink_raw_imu_t mlRawImuData;
+mavlink_raw_pressure_t mlRawPressureData;
+mavlink_attitude_t mlAttitudeData;
+mavlink_local_position_t mlLocalPositionData;
 
 struct CircBuffer protParseBuffer;
 CBRef ppBuffer;
@@ -97,6 +111,19 @@ void protParserInit(void){
 	memset(&senControlData, 0, sizeof(tSensData));
 	memset(&logControlData, 0, sizeof(tLogFloats));
 	filterControlData = 0;
+	
+	// Mavlink data structures
+	memset(&mlGpsData, 0, sizeof(mavlink_gps_raw_t));
+	memset(&mlCpuLoadData, 0, sizeof(mavlink_cpu_load_t));
+	memset(&mlAirData, 0, sizeof(mavlink_air_data_t));
+	memset(&mlSensorBiasData, 0, sizeof(mavlink_sensor_bias_t));
+	memset(&mlDiagnosticData, 0, sizeof(mavlink_diagnostic_t));
+	memset(&mlPilotConsoleData, 0, sizeof(mavlink_pilot_console_t));
+	memset(&mlPwmCommandsData ,0, sizeof(mavlink_pwm_commands_t));
+	memset(&mlRawImuData ,0, sizeof(mavlink_raw_imu_t));
+	memset(&mlRawPressureData ,0, sizeof(mavlink_raw_pressure_t));
+	memset(&mlAttitudeData ,0, sizeof(mavlink_attitude_t));	
+	memset(&mlLocalPositionData ,0, sizeof(mavlink_local_position_t));	
 	
 	// Control MCU boot procedures
 	#ifdef _IN_PC_

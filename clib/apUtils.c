@@ -113,12 +113,35 @@ void updateStates(unsigned char * completeSentence){
 			gpsControlData.fix				= completeSentence[28];	
 			gpsControlData.sats				= completeSentence[29];	
 			gpsControlData.newValue		 	= completeSentence[30];	
+			
+			// Mavlink
+			// =======
+			
+			mlGpsData.fix_type = gpsControlData.fix;
+			mlGpsData.lat = gpsControlData.lat.flData;
+			mlGpsData.lon = gpsControlData.lon.flData;
+			mlGpsData.alt = gpsControlData.height.flData;
+			mlGpsData.eph = gpsControlData.hdop.usData;
+			mlGpsData.epv = 0.0;
+			mlGpsData.v = ((float)gpsControlData.sog.usData/100.0);
+			mlGpsData.hdg = gpsControlData.cog.usData;
+			
+			
 		break;
 		case LOADMSG_ID:
 			statusControlData.load		 		= completeSentence[4];
 			statusControlData.vdetect	 		= completeSentence[5];
 			statusControlData.bVolt.chData[0] 	= completeSentence[6];
 			statusControlData.bVolt.chData[1] 	= completeSentence[7];
+			
+			// Mavlink
+			// =======
+			
+			mlCpuLoadData.target = SLUGS_SYSTEMID;
+			mlCpuLoadData.sensLoad = statusControlData.load;
+			mlCpuLoadData.ctrlLoad = statusControlData.vdetect;
+			mlCpuLoadData.batVolt  = statusControlData.bVolt.usData;
+			
 		break;
 		case RAWMSG_ID: // Sensor Raw data
 			rawControlData.gyroX.chData[0]	= completeSentence[4];	
@@ -147,7 +170,25 @@ void updateStates(unsigned char * completeSentence){
 			rawControlData.powr.chData[0]	= completeSentence[26];	  
 			rawControlData.powr.chData[1]	= completeSentence[27];
 			rawControlData.ther.chData[0]	= completeSentence[28];	  
-			rawControlData.ther.chData[1]	= completeSentence[29];	 
+			rawControlData.ther.chData[1]	= completeSentence[29];	
+			
+			// Mavlink
+			// =======
+			
+			mlRawImuData.xacc = rawControlData.gyroX.shData;
+			mlRawImuData.yacc = rawControlData.gyroY.shData;
+			mlRawImuData.zacc = rawControlData.gyroZ.shData;
+			mlRawImuData.xgyro = rawControlData.accelX.shData;
+			mlRawImuData.ygyro = rawControlData.accelY.shData;
+			mlRawImuData.zgyro = rawControlData.accelZ.shData;
+			mlRawImuData.xmag = rawControlData.magX.shData;
+			mlRawImuData.ymag = rawControlData.magY.shData;
+			mlRawImuData.zmag = rawControlData.magZ.shData;
+
+			mlRawPressureData.press_abs = rawControlData.baro.shData;
+			mlRawPressureData.press_diff1 = rawControlData.pito.shData;
+			mlRawPressureData.press_diff2 = rawControlData.powr.shData;
+			 
 		break;
 		case ATTMSG_ID:
 			attitudeControlData.roll.chData[0]		= completeSentence[4];
@@ -176,6 +217,17 @@ void updateStates(unsigned char * completeSentence){
 			attitudeControlData.r.chData[3]			= completeSentence[27];			
 			attitudeControlData.timeStamp.chData[0]	= completeSentence[28];			
 			attitudeControlData.timeStamp.chData[1]	= completeSentence[29];			
+			
+			// Mavlink
+			// =======
+			
+			mlAttitudeData.roll = attitudeControlData.roll.flData;
+			mlAttitudeData.pitch = attitudeControlData.pitch.flData;
+			mlAttitudeData.yaw = attitudeControlData.yaw.flData;
+			mlAttitudeData.rollspeed = attitudeControlData.p.flData;
+			mlAttitudeData.pitchspeed = attitudeControlData.q.flData;
+			mlAttitudeData.yawspeed = attitudeControlData.r.flData;
+			
 		break;
     case DYNMSG_ID:
 			dynTempControlData.dynamic.chData[0]	= completeSentence[4];
@@ -188,6 +240,15 @@ void updateStates(unsigned char * completeSentence){
 			dynTempControlData.stat.chData[3]	= completeSentence[11];
 			dynTempControlData.temp.chData[0]	= completeSentence[12];	  
 			dynTempControlData.temp.chData[1]	= completeSentence[13];	  
+			
+			// Mavlink
+			// =======
+			
+			mlAirData.target = SLUGS_SYSTEMID;
+			mlAirData.dynamicPressure = dynTempControlData.dynamic.flData;
+			mlAirData.staticPressure  = dynTempControlData.stat.flData;
+			mlAirData.temperature     = (float)dynTempControlData.temp.shData;
+
 		break;
 		case BIAMSG_ID:
 			// Note that as an additional tool the bias messages can be used as 
@@ -220,6 +281,18 @@ void updateStates(unsigned char * completeSentence){
 				biasControlData.gzb.chData[2]	= completeSentence[26];
 				biasControlData.gzb.chData[3]	= completeSentence[27];			
 			//#endif
+				
+			// Mavlink
+			// =======
+			
+			mlSensorBiasData.target = SLUGS_SYSTEMID;
+			mlSensorBiasData.axBias = biasControlData.axb.flData;
+			mlSensorBiasData.ayBias = biasControlData.ayb.flData;
+			mlSensorBiasData.azBias = biasControlData.azb.flData;
+			mlSensorBiasData.gxBias = biasControlData.gxb.flData;
+			mlSensorBiasData.gyBias = biasControlData.gyb.flData;
+			mlSensorBiasData.gzBias = biasControlData.gzb.flData;
+
 		break;		
 		case DIAMSG_ID:
 			//change comment on USE_SENSOR_MCU_DIAG (in apUtils.h) if you want to use diagnostic data
@@ -245,6 +318,18 @@ void updateStates(unsigned char * completeSentence){
 				diagControlData.sh3.chData[0]	= completeSentence[20];
 				diagControlData.sh3.chData[1]	= completeSentence[21];
 			#endif		
+				
+			// Mavlink
+			// =======
+			
+			mlDiagnosticData.target = SLUGS_SYSTEMID;
+			mlDiagnosticData.diagFl1 = diagControlData.fl1.flData;
+			mlDiagnosticData.diagFl2 = diagControlData.fl2.flData;
+			mlDiagnosticData.diagFl3 = diagControlData.fl3.flData;
+			mlDiagnosticData.diagSh1 = diagControlData.sh1.shData;
+			mlDiagnosticData.diagSh2 = diagControlData.sh2.shData;
+			mlDiagnosticData.diagSh3 = diagControlData.sh3.shData;
+			
 		break;
 		case XYZMSG_ID:
 			xyzControlData.Xcoord.chData[0]	= completeSentence[4];
@@ -271,6 +356,17 @@ void updateStates(unsigned char * completeSentence){
 			xyzControlData.VZ.chData[1]		= completeSentence[25];
 			xyzControlData.VZ.chData[2]		= completeSentence[26];
 			xyzControlData.VZ.chData[3]		= completeSentence[27];
+			
+			// Mavlink
+			// =======
+			
+			mlLocalPositionData.x = xyzControlData.Xcoord.flData;
+			mlLocalPositionData.y = xyzControlData.Ycoord.flData;
+			mlLocalPositionData.z = xyzControlData.Zcoord.flData;
+			mlLocalPositionData.vx= xyzControlData.VX.flData;
+			mlLocalPositionData.vy= xyzControlData.VY.flData;
+			mlLocalPositionData.vz= xyzControlData.VZ.flData;
+			
 		break;	
 		case FILMSG_ID:
 			// turn the HIL on
@@ -306,6 +402,17 @@ void updateStates(unsigned char * completeSentence){
 				}
 				
 			#endif 
+				
+			// Mavlink
+			// =======
+			
+			mlPilotConsoleData.target = SLUGS_SYSTEMID;
+			mlPilotConsoleData.dt = pilControlData.dt.usData;
+			mlPilotConsoleData.dla = pilControlData.dla.usData;
+			mlPilotConsoleData.dra = pilControlData.dra.usData;
+			mlPilotConsoleData.dr = pilControlData.dr.usData;
+			mlPilotConsoleData.de = pilControlData.de.usData;
+
 		break;
 		
 		case AKNMSG_ID: // Aknowledge Messages
@@ -339,6 +446,22 @@ void updateStates(unsigned char * completeSentence){
 	   		pwmControlData.da1_c.chData[1]		= completeSentence[21];	  
 	   		pwmControlData.da2_c.chData[0]		= completeSentence[22];	  
 	   		pwmControlData.da2_c.chData[1]		= completeSentence[23];	  
+	   		
+	   	// Mavlink
+			// =======
+			
+			mlPwmCommandsData.target = SLUGS_SYSTEMID;
+			mlPwmCommandsData.dt_c =  pwmControlData.dt_c.usData;
+			mlPwmCommandsData.dla_c = pwmControlData.dla_c.usData;
+			mlPwmCommandsData.dra_c = pwmControlData.dra_c.usData;
+			mlPwmCommandsData.dr_c =  pwmControlData.dr_c.usData;
+			mlPwmCommandsData.dle_c = pwmControlData.dle_c.usData;
+			mlPwmCommandsData.dre_c = pwmControlData.dre_c.usData;
+			mlPwmCommandsData.dlf_c = pwmControlData.dlf_c.usData;
+			mlPwmCommandsData.drf_c = pwmControlData.drf_c.usData;
+			mlPwmCommandsData.aux1 =  pwmControlData.da1_c.usData;
+			mlPwmCommandsData.aux2 =  pwmControlData.da2_c.usData;
+			
 		break;
 		
 		case APSMSG_ID: // AP Status Report

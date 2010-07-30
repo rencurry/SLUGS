@@ -1,3 +1,4 @@
+
 /*
 The MIT License
 
@@ -23,41 +24,27 @@ THE SOFTWARE.
 
 */
 
-#ifndef _GROUNDSTATIONDRIVER_H_
-#define _GROUNDSTATIONDRIVER_H_
 
-#ifdef __cplusplus
-       extern "C"{
-#endif
+// This file is included since Microchip does not provide inttypes.h as PART
+// of the C30 compiler. This is NOT a full inttypes.h implementation
 
-#include "circBuffer.h"
-#include "apDefinitions.h"
-#include "protDecoder.h"
-#include "apUtils.h"
-#include <p33fxxxx.h>
-#include <string.h>
-#include <uart.h>
-#include "DEE.h"
-#include "interProcCommSlave.h"
+#ifndef INTTYPES_H_INCL
+#define INTTYPES_H_INCL 
 
-       	
-void uart1Init (void);
-void gsRead (unsigned char* gsChunk);       	
-void prepareTelemetry ( unsigned char* dataOut);
-void updatePWM (unsigned short * PWMData);
-void updatePWM2 (unsigned short PWMData, unsigned char channel );
-void updateLoad (unsigned char mcuLoad);
-void controlMCUInit (void);
-void EEPInit (void);
-void loadEEPData (void);
-void pilotCommands (unsigned short* pilCom);
-void updateEuler (float* newEuler);
-void updatePQR (float* newPQR);
+#include <limits.h>
+#include <stdint.h>
 
+#define UINT8_MAX  UCHAR_MAX
+#define INT8_MAX   SCHAR_MAX
+#define INT8_MIN   SCHAR_MIN
+#define UINT16_MAX USHRT_MAX
+#define INT16_MAX  SHRT_MAX
+#define INT16_MIN  SHRT_MIN
+#define UINT32_MAX ULONG_MAX
+#define INT32_MAX  LONG_MAX
+#define INT32_MIN  LONG_MIN
+#define UINT64_MAX ULLONG_MAX
+#define INT64_MAX  LLONG_MAX
+#define INT64_MIN  LLONG_MIN
 
-#ifdef __cplusplus
-      }
-#endif
-
-
-#endif /* _GROUNDSTATIONDRIVER_H_ */
+#endif // #ifndef INTTYPES_H_INCL
